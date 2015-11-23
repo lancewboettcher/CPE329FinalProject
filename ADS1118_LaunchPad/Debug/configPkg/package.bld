@@ -11,7 +11,7 @@ var makeAssembly = false;
 var Executable = xdc.module('xdc.bld.Executable');
 
 var exeOpts = new Executable.Attrs({
-        cfgScript: 'C:/Users/Lance Boettcher/Desktop/sbac121a/430BOOST-ADS1118-SFT/ADS1118_LaunchPad_CCS5.3/main.cfg',
+        cfgScript: 'C:/SPB_Data/git/CPE329FinalProject/ADS1118_LaunchPad/main.cfg',
         profile: 'debug',
         cfgHome: 'configPkg',
 });
@@ -41,7 +41,7 @@ else {
 
 var thisObj = {
     cfg:        '../main.cfg',
-    outputPath: 'C:/Users/Lance Boettcher/Desktop/sbac121a/430BOOST-ADS1118-SFT/ADS1118_LaunchPad_CCS5.3/Debug/configPkg',
+    outputPath: 'C:/SPB_Data/git/CPE329FinalProject/ADS1118_LaunchPad/Debug/configPkg',
     exeName:    'main' + suffix,
     exeIntName: 'main' + suffix.replace('.', '_'),
     targ:       targ,

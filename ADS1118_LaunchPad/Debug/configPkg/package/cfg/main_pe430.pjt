@@ -8,9 +8,9 @@ Tool="CustomBuilder"
 Config="Executable"
 
 [Project Dependencies]
-Source="C:/Users/Lance Boettcher/Desktop/sbac121a/430BOOST-ADS1118-SFT/ADS1118_LaunchPad_CCS5.3/Debug/configPkg/package/configPkg.pjt"
+Source="C:/SPB_Data/git/CPE329FinalProject/ADS1118_LaunchPad/Debug/configPkg/package/configPkg.pjt"
 
-["C:/Users/Lance Boettcher/Desktop/sbac121a/430BOOST-ADS1118-SFT/ADS1118_LaunchPad_CCS5.3/Debug/configPkg/package/configPkg.pjt" Settings]
+["C:/SPB_Data/git/CPE329FinalProject/ADS1118_LaunchPad/Debug/configPkg/package/configPkg.pjt" Settings]
 ExcludeFromBuild=true
 
 
@@ -20,7 +20,7 @@ ExcludeFromBuild=true
 ;  directories.
 ;
 ["Compiler" Settings: "Executable"]
-Options=-i"C:/CCSv5.3/grace_2_00_01_65/packages" -i"C:/CCSv5.3/ccsv5/ccs_base" -i"C:/CCSv5.3/ccsv5/ccs_base/msp430/msp430ware_1_25_00_30/packages" -i"C:/CCSv5.3/xdctools_3_24_05_48/packages" -i"C:\Users\Lance Boettcher\Desktop\sbac121a\430BOOST-ADS1118-SFT\ADS1118_LaunchPad_CCS5.3\Debug" 
+Options=-i"C:/CCSv5.3/grace_2_00_01_65/packages" -i"C:/CCSv5.3/ccsv5/ccs_base" -i"C:/CCSv5.3/ccsv5/ccs_base/msp430/msp430ware_1_25_00_30/packages" -i"C:/CCSv5.3/xdctools_3_24_05_48/packages" -i"C:\SPB_Data\git\CPE329FinalProject\ADS1118_LaunchPad\Debug" 
 
 [External Makefile]
 ExtMakefile=../../package.bld
@@ -32,7 +32,7 @@ ExtMakefile=../../package.bld
 [Source Files]
 Source="../../package.bld"
 Source="main_xe430.c"
-Source="../../C:/Users/Lance Boettcher/Desktop/sbac121a/430BOOST-ADS1118-SFT/ADS1118_LaunchPad_CCS5.3/main.cfg"
+Source="../../C:/SPB_Data/git/CPE329FinalProject/ADS1118_LaunchPad/main.cfg"
 
 ["../../package.bld" Settings: "Executable"]
 UseCustomBuild=true
@@ -66,5 +66,5 @@ Run=Always
 ["main_xe430.c" Settings: "Executable"]
 ExcludeFromBuild=true
 
-["../../C:/Users/Lance Boettcher/Desktop/sbac121a/430BOOST-ADS1118-SFT/ADS1118_LaunchPad_CCS5.3/main.cfg" Settings: "Executable"]
+["../../C:/SPB_Data/git/CPE329FinalProject/ADS1118_LaunchPad/main.cfg" Settings: "Executable"]
 ExcludeFromBuild=true

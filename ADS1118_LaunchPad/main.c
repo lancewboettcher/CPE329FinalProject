@@ -46,6 +46,7 @@ void half_second();
 void time_display();
 void ADC_display();
 void delay(void);		//delay function
+void meatSelect();
 
 #define BUZZ_ON 	P1OUT &= ~BIT0;	//set P1.0 low
 #define BUZZ_OFF 	P1OUT |= BIT0;	//set P1.0 high
@@ -115,6 +116,9 @@ int main(int argc, char *argv[])
    		{
    			flag &= ~ BIT1;			// flag is reset
    			time_state = 0;			//when threshold temperature is setting, setting time is disable.
+
+   			meatSelect();
+
    			if(Thr_state >= 3)		// if in state 3, change to state 0;
    			{
    				Thr_state = 0;
@@ -179,6 +183,22 @@ int main(int argc, char *argv[])
     return (0);
 }
 
+void meatSelect() {
+
+	LCD_clear();					// LCD clear
+	LCD_display_string(0, "Select Your Meat");
+
+	while(1) {
+		LCD_display_string(1,"    Chicken");
+		__delay_cycles(500000);
+
+		LCD_display_string(1,"                ");
+		__delay_cycles(500000);
+	}
+
+
+	while(1);
+}
 
 void delay(void)
 {

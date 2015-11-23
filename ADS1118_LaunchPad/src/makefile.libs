@@ -1,6 +1,6 @@
 #
 # This file was generated based on the configuration script:
-#     C:\Users\Lance Boettcher\Desktop\sbac121a\430BOOST-ADS1118-SFT\ADS1118_LaunchPad_CCS5.3\main.cfg
+#     C:\SPB_Data\git\CPE329FinalProject\ADS1118_LaunchPad\main.cfg
 #
 # This makefile may be included in other makefiles that need to build
 # the libraries containing the compiled source files generated as
@@ -14,7 +14,7 @@
 #
 # The absolute path to the generated source directory (at the time the
 # sources were generated) is:
-#    C:\Users\Lance Boettcher\Desktop\sbac121a\430BOOST-ADS1118-SFT\ADS1118_LaunchPad_CCS5.3\src
+#    C:\SPB_Data\git\CPE329FinalProject\ADS1118_LaunchPad\src
 #
 GEN_SRC_DIR ?= ../src
 

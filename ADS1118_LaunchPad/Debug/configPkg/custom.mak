@@ -3,4 +3,4 @@
   package/cfg/main_pe430.oe430 \
 
 linker.cmd: package/cfg/main_pe430.xdl
-	$(SED) 's"^\"\(package/cfg/main_pe430cfg.cmd\)\"$""\"C:/Users/Lance Boettcher/Desktop/sbac121a/430BOOST-ADS1118-SFT/ADS1118_LaunchPad_CCS5.3/Debug/configPkg/\1\""' package/cfg/main_pe430.xdl > $@
+	$(SED) 's"^\"\(package/cfg/main_pe430cfg.cmd\)\"$""\"C:/SPB_Data/git/CPE329FinalProject/ADS1118_LaunchPad/Debug/configPkg/\1\""' package/cfg/main_pe430.xdl > $@

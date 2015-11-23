@@ -50,7 +50,7 @@
  *  Define absolute path prefix for this executable's
  *  configuration generated files.
  */
-xdc__META(__ASM__, "@(#)__ASM__ = C:/Users/Lance Boettcher/Desktop/sbac121a/430BOOST-ADS1118-SFT/ADS1118_LaunchPad_CCS5.3/Debug/configPkg/package/cfg/main_pe430");
+xdc__META(__ASM__, "@(#)__ASM__ = C:/SPB_Data/git/CPE329FinalProject/ADS1118_LaunchPad/Debug/configPkg/package/cfg/main_pe430");
 
 /*
  *  ======== __ISA__ ========
