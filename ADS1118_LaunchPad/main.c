@@ -80,7 +80,9 @@ unsigned int Thr_temp;	// Threshold temperature
 unsigned int set_temp;	// temporary for setting Threshold temperature
 unsigned int num=0;	// temporary for setting Threshold temperature
 		 int Act_temp;	// Actual temperature
+		 int meatState;
 
+int meatTemps[8] = {0, 165, 135, 140, 150, 145, 145, 165};
 /*
  *  ======== main ========
  */
@@ -184,20 +186,84 @@ int main(int argc, char *argv[])
 }
 
 void meatSelect() {
+	meatState = 1;
 
 	LCD_clear();					// LCD clear
 	LCD_display_string(0, "Select Your Meat");
 
-	while(1) {
-		LCD_display_string(1,"    Chicken");
-		__delay_cycles(500000);
+	while(!(flag & BIT1)) { //While button is not pressed
 
-		LCD_display_string(1,"                ");
-		__delay_cycles(500000);
+		if (flag & BIT0) { //Button pressed, display next meat
+			flag &= ~ BIT0; //Clear the button flag
+			meatState++;
+		}
+
+		if (meatState == 1) {
+			if (flag & BIT6) {
+				LCD_display_string(1,"                ");
+			} else {
+				LCD_display_string(1,"    Chicken     ");
+			}
+		}
+		else if (meatState == 2) {
+			if (flag & BIT6) {
+				LCD_display_string(1,"                ");
+			} else {
+				LCD_display_string(1," Beef - Med Rare");
+			}
+		}
+		else if (meatState == 3) {
+			if (flag & BIT6) {
+				LCD_display_string(1,"                ");
+			} else {
+				LCD_display_string(1," Beef - Medium  ");
+			}
+		}
+		else if (meatState == 4) {
+			if (flag & BIT6) {
+				LCD_display_string(1,"                ");
+			} else {
+				LCD_display_string(1," Beef - Med Well");
+			}
+		}
+		else if (meatState == 5) {
+			if (flag & BIT6) {
+				LCD_display_string(1,"                ");
+			} else {
+				LCD_display_string(1,"      Pork      ");
+			}
+		}
+		else if (meatState == 6) {
+			if (flag & BIT6) {
+				LCD_display_string(1,"                ");
+			} else {
+				LCD_display_string(1,"     Seafood    ");
+			}
+		}
+		else if (meatState == 7) {
+			if (flag & BIT6) {
+				LCD_display_string(1,"                ");
+			} else {
+				LCD_display_string(1,"     Turkey     ");
+			}
+		}
+		else if (meatState == 7) {
+			if (flag & BIT6) {
+				LCD_display_string(1,"                ");
+			} else {
+				LCD_display_string(1,"     Custom     ");
+			}
+		}
 	}
 
+	flag &= ~ BIT1; //Clear the button flag
 
-	while(1);
+	if (meatState == 7) {
+		Thr_state = 1; 		//Go into the temp set state machine
+	} else {
+		set_temp = meatTemps[state];
+		Thr_state = 4;		//Set the new temperature
+	}
 }
 
 void delay(void)
@@ -466,6 +532,8 @@ void System_Initial()
 	time_state = 0;	//time setting state machine counter
 	Thr_temp = 100; //configure threshold temperature to 100;
 	Act_temp = 250;
+
+	meatState = 0;
 
 	// IO initial
 	P1OUT = 0x09;
