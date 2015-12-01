@@ -81,7 +81,16 @@ unsigned int set_temp;	// temporary for setting Threshold temperature
 unsigned int num=0;	// temporary for setting Threshold temperature
 		 int Act_temp;	// Actual temperature
 		 int meatState;
-
+		 int customThreshold;
+/*
+	chicken: 165 degrees
+	medium rare: 135 degrees
+	medium: 140 degrees
+	medium well: 150 degrees
+	pork: 145 degrees
+	seafood: 145 degrees
+	turkey: 165 degrees
+ */
 int meatTemps[8] = {0, 165, 135, 140, 150, 145, 145, 165};
 /*
  *  ======== main ========
@@ -119,13 +128,16 @@ int main(int argc, char *argv[])
    			flag &= ~ BIT1;			// flag is reset
    			time_state = 0;			//when threshold temperature is setting, setting time is disable.
 
-   			meatSelect();
+   			if(!customThreshold)
+   				meatSelect();
 
    			if(Thr_state >= 3)		// if in state 3, change to state 0;
    			{
    				Thr_state = 0;
    				Thr_temp = set_temp;				// assign threshold temperature
    				LCD_display_number(0,3,Thr_temp);	// display threshold temperature
+
+   				customThreshold = 0;
    			}
    			else					//else, Thr_state is changed to next state
    			{
@@ -196,6 +208,10 @@ void meatSelect() {
 		if (flag & BIT0) { //Button pressed, display next meat
 			flag &= ~ BIT0; //Clear the button flag
 			meatState++;
+
+			if (meatState == 9) {
+				meatState = 1;
+			}
 		}
 
 		if (meatState == 1) {
@@ -247,7 +263,7 @@ void meatSelect() {
 				LCD_display_string(1,"     Turkey     ");
 			}
 		}
-		else if (meatState == 7) {
+		else if (meatState == 8) {
 			if (flag & BIT6) {
 				LCD_display_string(1,"                ");
 			} else {
@@ -258,10 +274,17 @@ void meatSelect() {
 
 	flag &= ~ BIT1; //Clear the button flag
 
-	if (meatState == 7) {
-		Thr_state = 1; 		//Go into the temp set state machine
+	LCD_clear();
+	LCD_display_string(0,"TH:");
+	LCD_display_string(1,"Temp:        CH1");
+	LCD_display_char(1,10,0xDF);
+
+	if (meatState == 8) {
+		set_temp = 100;
+		customThreshold = 1;
+		Thr_state = 0; 		//Go into the temp set state machine
 	} else {
-		set_temp = meatTemps[state];
+		set_temp = meatTemps[meatState];
 		Thr_state = 4;		//Set the new temperature
 	}
 }
@@ -526,7 +549,7 @@ void System_Initial()
 {
 	flag  = 0;		//reset flag
 
-	flag ^= BIT8;
+	flag ^= BIT8; 	// Default to farenheit
 
 	Thr_state = 0;  //threshold temperature setting state machine counter
 	time_state = 0;	//time setting state machine counter
@@ -534,6 +557,7 @@ void System_Initial()
 	Act_temp = 250;
 
 	meatState = 0;
+	customThreshold = 0;
 
 	// IO initial
 	P1OUT = 0x09;
@@ -541,7 +565,17 @@ void System_Initial()
 
 	LCD_init();						// LCD initial
 	LCD_clear();					// LCD clear
-	LCD_display_string(0,"TH:");	// display "ADS1118"
+
+	LCD_display_string(0,"  THERMOMEATER  ");
+
+	int i;
+	for (i = 0; i < 3; i++) {
+		_delay_cycles(1000000);
+	}
+
+	LCD_clear();
+
+	LCD_display_string(0,"TH:");
 	LCD_display_time(0,8,time);		// display current time
 	LCD_display_string(1,"Temp:        CH1");	// display threshold temp and actual temp;
 	LCD_display_char(1,10,0xDF);
