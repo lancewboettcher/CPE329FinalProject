@@ -82,6 +82,8 @@ unsigned int num=0;	// temporary for setting Threshold temperature
 		 int Act_temp;	// Actual temperature
 		 int meatState;
 		 int customThreshold;
+		 int timer;
+		 int timeState;
 /*
 	chicken: 165 degrees
 	medium rare: 135 degrees
@@ -135,7 +137,7 @@ int main(int argc, char *argv[])
    			{
    				Thr_state = 0;
    				Thr_temp = set_temp;				// assign threshold temperature
-   				LCD_display_number(0,3,Thr_temp);	// display threshold temperature
+   				LCD_display_number(0,4,Thr_temp);	// display threshold temperature
 
    				customThreshold = 0;
    			}
@@ -155,9 +157,9 @@ int main(int argc, char *argv[])
    				flag ^= BIT9;						// S2 and SW2 are pushed together to change input channel
    				flag ^= BIT8;
    				if(flag & BIT9)
-   					LCD_display_char(1,15,'2');
+   					LCD_display_string(1,"  Room :");
    				else
-   					LCD_display_char(1,15,'1');
+   					LCD_display_string(1," Probe :");
    			}
    			else
    			{
@@ -275,9 +277,9 @@ void meatSelect() {
 	flag &= ~ BIT1; //Clear the button flag
 
 	LCD_clear();
-	LCD_display_string(0,"TH:");
-	LCD_display_string(1,"Temp:        CH1");
-	LCD_display_char(1,10,0xDF);
+	LCD_display_string(0,"Des:");
+	LCD_display_string(1," Probe :");
+	LCD_display_char(1,13,0xDF);
 
 	if (meatState == 8) {
 		set_temp = 100;
@@ -286,6 +288,53 @@ void meatSelect() {
 	} else {
 		set_temp = meatTemps[meatState];
 		Thr_state = 4;		//Set the new temperature
+	}
+}
+
+void timeSelect() {
+	timeState = 1;
+
+	LCD_clear();					// LCD clear
+	LCD_display_string(0, "Choose an Option");
+
+	while(!(flag & BIT2)) { //While button is not pressed
+
+		if (flag & BIT0) { //Button pressed, display next option
+			flag &= ~ BIT0; //Clear the button flag
+			timeState++;
+
+			if (timeState == 3) {
+				timeState = 1;
+			}
+		}
+
+		if (timeState == 1) {
+			if (flag & BIT6) {
+				LCD_display_string(1,"                ");
+			} else {
+				LCD_display_string(1,"     Timer      ");
+			}
+		}
+		else if (timeState == 2) {
+			if (flag & BIT6) {
+				LCD_display_string(1,"                ");
+			} else {
+				LCD_display_string(1,"    Stopwatch   ");
+			}
+		}
+	}
+
+	flag &= ~ BIT2; //Clear the button flag
+
+	LCD_clear();
+	LCD_display_string(0,"Des:");
+	LCD_display_string(1," Probe :");
+	LCD_display_char(1,13,0xDF);
+
+	if (timeState == 1) {
+		timer = 1;
+	} else {
+		timer = 0;
 	}
 }
 
@@ -319,14 +368,14 @@ void ADC_display()
 		if(flag & BIT8)				// display temperature in Fahrenheit
 		{
 			Act_temp = temp * 9 / 5 +320;
-			LCD_display_temp(1,5,Act_temp);
-			LCD_display_char(1,11,'F');
+			LCD_display_temp(1,8,Act_temp);
+			LCD_display_char(1,14,'F');
 		}
 		else
 		{
 			Act_temp = temp;
-			LCD_display_temp(1,5,Act_temp);
-			LCD_display_char(1,11,'C');
+			LCD_display_temp(1,8,Act_temp);
+			LCD_display_char(1,14,'C');
 		}
 
 	}
@@ -389,23 +438,23 @@ void half_second()
 	if(Thr_state == 0x01)						//threshold temperature state machine output.
 	{
 		if (flag & BIT6)
-			LCD_display_char(0,4,' ');			//display blank space for half a second
+			LCD_display_char(0,3,' ');			//display blank space for half a second
 		else
-			LCD_display_number(0,3,set_temp);	//display hundred place for half a second
+			LCD_display_number(0,4,set_temp);	//display hundred place for half a second
 	}
 	else if(Thr_state == 0x02)
 	{
 		if (flag & BIT6)
-			LCD_display_char(0,5,' ');			//display blank space for half a second
+			LCD_display_char(0,4,' ');			//display blank space for half a second
 		else
-			LCD_display_number(0,3,set_temp);	//display decade for half a second
+			LCD_display_number(0,4,set_temp);	//display decade for half a second
 	}
 	else if(Thr_state == 0x03)
 	{
 		if (flag & BIT6)
-			LCD_display_char(0,6,' ');			//display blank space for half a second
+			LCD_display_char(0,5,' ');			//display blank space for half a second
 		else
-			LCD_display_number(0,3,set_temp); 	//display unit's digit for half a second
+			LCD_display_number(0,4,set_temp); 	//display unit's digit for half a second
 	}
 
 	// display time setting
@@ -569,18 +618,18 @@ void System_Initial()
 	LCD_display_string(0,"  THERMOMEATER  ");
 
 	int i;
-	for (i = 0; i < 3; i++) {
+	for (i = 0; i < 2; i++) {
 		_delay_cycles(1000000);
 	}
 
 	LCD_clear();
 
-	LCD_display_string(0,"TH:");
+	LCD_display_string(0,"Des:");
 	LCD_display_time(0,8,time);		// display current time
-	LCD_display_string(1,"Temp:        CH1");	// display threshold temp and actual temp;
-	LCD_display_char(1,10,0xDF);
-	LCD_display_char(1,11,'C');
-	LCD_display_number(0,3,Thr_temp);// display threshold temp number
+	LCD_display_string(1," Probe :");
+	LCD_display_char(1,13,0xDF);
+	LCD_display_char(1,14,'F');
+	LCD_display_number(0,4,Thr_temp);// display threshold temp number
 
 	ADS_Config(0); 					// set ADS1118 to convert local temperature, and start convertion.
 }

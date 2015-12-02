@@ -124,7 +124,7 @@ void LCD_display_number(unsigned char H,unsigned char L,unsigned int num)
   {
 	  LCD_writecom(0xc0+L);// row L
   }
-  LCD_writedata(i+0x30);
+ // LCD_writedata(i+0x30);
   LCD_writedata(j+0x30);
   LCD_writedata(k+0x30);
   LCD_writedata(l+0x30);
