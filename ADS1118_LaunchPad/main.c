@@ -1,11 +1,11 @@
 /*
- * 		- name: main.c
- *		- write data: 19 Nov. 2012
- *		- modification data: 31 Nov. 2012
- *		- author: Wayne Xu (a0219294)
- *		- version: v1.2
+ * 		CPE 329 Project 45
+ * 		Thermomeater
+ * 		Lance Boettcher
+ * 		Allie Lustig
  *
- * ***description
+ * 		Project Built on top of TI's sample code at
+ * 		http://www.ti.com/tool/430BOOST-ADS1118
  *
  * 1. Program uses GRACE configuration for Device Configuration;
  * 		- SMCLK, DCO at 1MHz
@@ -19,7 +19,8 @@
  * 		- P2.1, P2.2 as input: SW1, SW2.
  * 		- P1.0 as output, is used as switch of buzzer
  * 2. this project is used to measure the temperature by type-K thermocouple.
- * 		- far-end temperature is measured by thermocouple, local temperature is measured by the internal sensor of ADS1118
+ * 		- far-end temperature is measured by thermocouple, local temperature is measured
+ * 			by the internal sensor of ADS1118
  * 		- ADC mode: inputs are AIN0/AIN1, FS=+/-0.256, SS, DR=128sps, PULLUP on DOUT
  * 		- temperature mode: DR=128sps, PULLUP on DOUT
  * 		- Reference Tables are used to transform ADC code to temperature.
@@ -55,8 +56,10 @@ void meatSelect();
 /*
  * ======== global variable ========
  */
-/* flag is used to transmit parameter between interrupt service function and main function.
- * the flag will be changed by ISR in InterruptVectors_init.c     ...\grace\InterruptVectors_init.c
+/* flag is used to transmit parameter between interrupt
+ * service function and main function.
+ * the flag will be changed by ISR in
+ * InterruptVectors_init.c     ...\grace\InterruptVectors_init.c
  *
  * Bit0, Launchpad S2 is pushed
  * Bit1, SW1 on BoosterPack is pushed
@@ -70,7 +73,7 @@ void meatSelect();
  * Bit9, ADC channel flag, 0 for channel 0, 1 for channel 1.
  */
 volatile unsigned int  flag;		//global flag.
-volatile unsigned char Thr_state;	// state for threshold temperature setting state machine.
+volatile unsigned char Thr_state;	// state for threshold temp setting state machine.
 volatile unsigned char time_state;	// state for time setting state machine.
 
 
@@ -85,10 +88,12 @@ unsigned int num=0;	// temporary for setting Threshold temperature
 		 int timer;
 		 int timeState;
 /*
+  	Lookup table for threshold meat temperatures
+
 	chicken: 165 degrees
-	medium rare: 135 degrees
-	medium: 140 degrees
-	medium well: 150 degrees
+	beef medium rare: 135 degrees
+	beef medium: 140 degrees
+	beef medium well: 150 degrees
 	pork: 145 degrees
 	seafood: 145 degrees
 	turkey: 165 degrees
@@ -125,40 +130,39 @@ int main(int argc, char *argv[])
    			time_display();
    		}
 
-   		if(flag & BIT1)				// if SW1 is pushed, threshold temperature state machine will be changed
-   		{
+   		if(flag & BIT1)				// if SW1 is pushed, threshold temperature
+   		{							//   state machine will be changed
    			flag &= ~ BIT1;			// flag is reset
-   			time_state = 0;			//when threshold temperature is setting, setting time is disable.
-
-   			if(!customThreshold)
-   				meatSelect();
-
+   			time_state = 0;			//when threshold temperature is setting,
+   									//setting time is disable.
+   			if(!customThreshold) {
+   				meatSelect();		//Enter meat select menu if not setting custom
+   			}
    			if(Thr_state >= 3)		// if in state 3, change to state 0;
    			{
    				Thr_state = 0;
    				Thr_temp = set_temp;				// assign threshold temperature
    				LCD_display_number(0,4,Thr_temp);	// display threshold temperature
 
-   				customThreshold = 0;
+   				customThreshold = 0;		//Reset custom threshold flag
    			}
-   			else					//else, Thr_state is changed to next state
+   			else							//else, Thr_state is changed to next state
    			{
    				Thr_state ++;
-   				//time_state = 0;		//when threshold temperature is setting, setting time is disable.
    			}
    		}
 
-   		if((flag & BIT2) && (!Thr_state))			// if SW2 is pushed, and Thr_state = 0, time setting state machine will be changed
-   		{
-   			flag &= ~ BIT2;							// flag is reset
+   		if((flag & BIT2) && (!Thr_state))	// if SW2 is pushed, and Thr_state = 0,
+   		{									// time setting state machine will be changed
+   			flag &= ~ BIT2;					// flag is reset
 
    			if(!(P1IN & BIT3))
    			{
-   				flag ^= BIT9;						// S2 and SW2 are pushed together to change input channel
+   				flag ^= BIT9;		// S2 and SW2 are pushed together to change input
    				flag ^= BIT8;
-   				if(flag & BIT9)
-   					LCD_display_string(1,"  Room :");
-   				else
+   				if(flag & BIT9)		// Display external temp
+   					LCD_display_string(1,"   Ext :");
+   				else				//Display probe temp
    					LCD_display_string(1," Probe :");
    			}
    			else
@@ -172,12 +176,12 @@ int main(int argc, char *argv[])
    				}
    				else
    				{
-   				time_state ++;
+   					time_state ++;
    				}
    			}
    		}
 
-   		if(flag & BIT0)				// P1.3 service, set the Threshold temperature or Time.
+   		if(flag & BIT0)				// P1.3 service, set the Threshold temp or Time.
    		{
    			flag &= ~ BIT0;			// flag is reset
    			if(Thr_state != 0)
@@ -195,78 +199,81 @@ int main(int argc, char *argv[])
    		else
    		__no_operation();
    	}
-    
-    return (0);
 }
 
+/*
+ * Function to display the meat select menu
+ *
+ * Modifies the meatState global to the desired meat
+ */
 void meatSelect() {
 	meatState = 1;
 
-	LCD_clear();					// LCD clear
+	LCD_clear();
 	LCD_display_string(0, "Select Your Meat");
 
-	while(!(flag & BIT1)) { //While button is not pressed
+	while(!(flag & BIT1)) { 			//While button is not pressed
 
-		if (flag & BIT0) { //Button pressed, display next meat
-			flag &= ~ BIT0; //Clear the button flag
-			meatState++;
+		if (flag & BIT0) { 				//Button pressed, display next meat
+			flag &= ~ BIT0;			 	//Clear the button flag
+			meatState++;				//Advance meat state
 
-			if (meatState == 9) {
+			if (meatState == 9) {		//Go back to state 1 if 9
 				meatState = 1;
 			}
 		}
 
-		if (meatState == 1) {
-			if (flag & BIT6) {
+		if (meatState == 1) {			//Chicken
+			if (flag & BIT6) {			//Flash every 1/2 second
 				LCD_display_string(1,"                ");
 			} else {
 				LCD_display_string(1,"    Chicken     ");
 			}
 		}
-		else if (meatState == 2) {
-			if (flag & BIT6) {
+		else if (meatState == 2) {		//Beef Med Rare
+			if (flag & BIT6) {			//Flash every 1/2 second
 				LCD_display_string(1,"                ");
 			} else {
 				LCD_display_string(1," Beef - Med Rare");
 			}
 		}
-		else if (meatState == 3) {
-			if (flag & BIT6) {
+		else if (meatState == 3) {		//Beef Medium
+			if (flag & BIT6) {			//Flash every 1/2 second
 				LCD_display_string(1,"                ");
 			} else {
 				LCD_display_string(1," Beef - Medium  ");
 			}
 		}
-		else if (meatState == 4) {
-			if (flag & BIT6) {
+		else if (meatState == 4) {		//Beef Med Well
+			if (flag & BIT6) {			//Flash every 1/2 second
 				LCD_display_string(1,"                ");
 			} else {
 				LCD_display_string(1," Beef - Med Well");
 			}
 		}
-		else if (meatState == 5) {
-			if (flag & BIT6) {
+		else if (meatState == 5) {		//Pork
+			if (flag & BIT6) {			//Flash every 1/2 second
 				LCD_display_string(1,"                ");
 			} else {
 				LCD_display_string(1,"      Pork      ");
 			}
 		}
-		else if (meatState == 6) {
-			if (flag & BIT6) {
+		else if (meatState == 6) {		//Seafood
+			if (flag & BIT6) {			//Flash every 1/2 second
 				LCD_display_string(1,"                ");
 			} else {
 				LCD_display_string(1,"     Seafood    ");
 			}
 		}
-		else if (meatState == 7) {
-			if (flag & BIT6) {
+		else if (meatState == 7) {		//Turkey
+			if (flag & BIT6) {			//Flash every 1/2 second
 				LCD_display_string(1,"                ");
 			} else {
 				LCD_display_string(1,"     Turkey     ");
 			}
 		}
-		else if (meatState == 8) {
-			if (flag & BIT6) {
+		else if (meatState == 8) {		//Custom
+			if (flag & BIT6) {			//Flash every 1/2 second
 				LCD_display_string(1,"                ");
 			} else {
 				LCD_display_string(1,"     Custom     ");
@@ -274,67 +281,23 @@ void meatSelect() {
 		}
 	}
 
-	flag &= ~ BIT1; //Clear the button flag
+	//Done with the meat select cycle (SW1 pressed)
 
+	flag &= ~ BIT1; 					//Clear the button flag
+
+	//Go back to the temperature display screen
 	LCD_clear();
 	LCD_display_string(0,"Des:");
 	LCD_display_string(1," Probe :");
 	LCD_display_char(1,13,0xDF);
 
-	if (meatState == 8) {
-		set_temp = 100;
-		customThreshold = 1;
+	if (meatState == 8) {	//Custom threshold temp
+		set_temp = 100;		//Set initial temp
+		customThreshold = 1;//Set customThreshold flag
 		Thr_state = 0; 		//Go into the temp set state machine
 	} else {
-		set_temp = meatTemps[meatState];
+		set_temp = meatTemps[meatState];//Set threshold temp to selected
 		Thr_state = 4;		//Set the new temperature
-	}
-}
-
-void timeSelect() {
-	timeState = 1;
-
-	LCD_clear();					// LCD clear
-	LCD_display_string(0, "Choose an Option");
-
-	while(!(flag & BIT2)) { //While button is not pressed
-
-		if (flag & BIT0) { //Button pressed, display next option
-			flag &= ~ BIT0; //Clear the button flag
-			timeState++;
-
-			if (timeState == 3) {
-				timeState = 1;
-			}
-		}
-
-		if (timeState == 1) {
-			if (flag & BIT6) {
-				LCD_display_string(1,"                ");
-			} else {
-				LCD_display_string(1,"     Timer      ");
-			}
-		}
-		else if (timeState == 2) {
-			if (flag & BIT6) {
-				LCD_display_string(1,"                ");
-			} else {
-				LCD_display_string(1,"    Stopwatch   ");
-			}
-		}
-	}
-
-	flag &= ~ BIT2; //Clear the button flag
-
-	LCD_clear();
-	LCD_display_string(0,"Des:");
-	LCD_display_string(1," Probe :");
-	LCD_display_char(1,13,0xDF);
-
-	if (timeState == 1) {
-		timer = 1;
-	} else {
-		timer = 0;
 	}
 }
 
@@ -356,14 +319,18 @@ void ADC_display()
 	flag &= ~ BIT4;					// flag is reset
 	if (!(flag & BIT5))
 	{
-		local_data = ADS_Read(1);	//read local temperature data,and start a new convertion for far-end temperature sensor.
-	}
+		local_data = ADS_Read(1);	//read local temperature data and start a new
+	}								//conversion for far-end temperature sensor.
 	else
 	{
-		far_data = ADS_Read(0);		//read far-end temperature,and start a new convertion for local temperature sensor.
-		temp = far_data + local_compensation(local_data);	// transform the local_data to compensation codes of far-end.
+		far_data = ADS_Read(0);		//read far-end temperature,and start a new conversion
+									//for local temperature sensor.
 
-		temp = ADC_code2temp(temp);	// transform the far-end thermocouple codes to temperature.
+		// transform the local_data to compensation codes of far-end.
+		temp = far_data + local_compensation(local_data);
+
+		temp = ADC_code2temp(temp);	// transform the far-end
+									// thermocouple codes to temperature.
 
 		if(flag & BIT8)				// display temperature in Fahrenheit
 		{
@@ -379,12 +346,6 @@ void ADC_display()
 		}
 
 	}
-		// transmit temperature to PC by UART;
-		/*
-		hex2asc(&temp, 4, 2, data);
-	   	uart_txstr(data); //the temperature is displayed in hexadecimal.
-	   	uart_txc('\n');
-		*/
 }
 void time_display()
 {
@@ -401,8 +362,6 @@ void time_display()
   			time--;
   		}
 
-
-
   		LCD_display_time(0,8,time);		// display time on LCD
 	}
 }
@@ -410,7 +369,8 @@ void time_display()
 /*
  * function name: half_second()
  * description: it is executed every half a second. it has three functions,
- * the first one is to compare the Actual temperature and threshold temperature, if Actual temperature is higher than threshold
+ * the first one is to compare the Actual temperature and threshold temperature,
+ * if Actual temperature is higher than threshold
  * temperature, buzzer will work
  * the second one is to flicker the threshold temperature bit which is being set.
  * the third one is to flicker the time bit which is being set.
@@ -420,7 +380,7 @@ void half_second()
 {
 	flag &= ~ BIT7;
 
-	// judge actual temperature is higher than threshold temperature. if higher, buzzer will work
+	// judge actual temperature is higher than threshold temperature - Buzzer
 	if((Act_temp >= (10*Thr_temp)) && (flag & BIT6))
 	{
 	   	BUZZ_ON;
@@ -435,57 +395,57 @@ void half_second()
 	}
 
 	//display threshold temperature setting
-	if(Thr_state == 0x01)						//threshold temperature state machine output.
+	if(Thr_state == 0x01)					 //threshold temperature state machine output.
 	{
 		if (flag & BIT6)
-			LCD_display_char(0,3,' ');			//display blank space for half a second
+			LCD_display_char(0,4,' ');		 //display blank space for half a second
 		else
-			LCD_display_number(0,4,set_temp);	//display hundred place for half a second
+			LCD_display_number(0,4,set_temp);//display hundred place for half a second
 	}
 	else if(Thr_state == 0x02)
 	{
 		if (flag & BIT6)
-			LCD_display_char(0,4,' ');			//display blank space for half a second
+			LCD_display_char(0,5,' ');		 //display blank space for half a second
 		else
-			LCD_display_number(0,4,set_temp);	//display decade for half a second
+			LCD_display_number(0,4,set_temp);//display decade for half a second
 	}
 	else if(Thr_state == 0x03)
 	{
 		if (flag & BIT6)
-			LCD_display_char(0,5,' ');			//display blank space for half a second
+			LCD_display_char(0,6,' ');		 //display blank space for half a second
 		else
-			LCD_display_number(0,4,set_temp); 	//display unit's digit for half a second
+			LCD_display_number(0,4,set_temp);//display unit's digit for half a second
 	}
 
 	// display time setting
 	if(time_state == 0x01)
 	{
 		if (flag & BIT6)
-			LCD_display_char(0,11,' ');			//display blank space for half a second
+			LCD_display_char(0,11,' ');	   //display blank space for half a second
 		else
-			LCD_display_time(0,8,set_time);;	//display hundred place for half a second
+			LCD_display_time(0,8,set_time);//display hundred place for half a second
 	}
 
 	else if(time_state == 0x02)
 	{
 		if (flag & BIT6)
-			LCD_display_char(0,12,' ');			//display blank space for half a second
+			LCD_display_char(0,12,' ');	   //display blank space for half a second
 		else
-			LCD_display_time(0,8,set_time);;	//display hundred place for half a second
+			LCD_display_time(0,8,set_time);//display hundred place for half a second
 	}
 	else if(time_state == 0x03)
 	{
 		if (flag & BIT6)
-			LCD_display_char(0,14,' ');			//display blank space for half a second
+			LCD_display_char(0,14,' ');	   //display blank space for half a second
 		else
-			LCD_display_time(0,8,set_time);;	//display hundred place for half a second
+			LCD_display_time(0,8,set_time);//display hundred place for half a second
 	}
 	else if(time_state == 0x04)
 	{
 		if (flag & BIT6)
-			LCD_display_char(0,15,' ');			//display blank space for half a second
+			LCD_display_char(0,15,' ');	   //display blank space for half a second
 		else
-			LCD_display_time(0,8,set_time);;	//display hundred place for half a second
+			LCD_display_time(0,8,set_time);//display hundred place for half a second
 	}
 }
 
@@ -548,7 +508,8 @@ void set_Time()
 
 /*
  * function name:set_hrtemp()
- * description: set the threshold temperature. the temporary is saved in variable set_temp.
+ * description: set the threshold temperature.
+ * the temporary is saved in variable set_temp.
  */
 void set_Thrtemp()
 {
@@ -592,7 +553,7 @@ void set_Thrtemp()
 
 /*
  * function name:System_Initial()
- * description: Initialize the system. include I/O, LCD and ADS1118.
+ * description: Initialize the system. include I/O, LCD and ADS1118 and meat select.
  */
 void System_Initial()
 {
@@ -605,8 +566,8 @@ void System_Initial()
 	Thr_temp = 100; //configure threshold temperature to 100;
 	Act_temp = 250;
 
-	meatState = 0;
-	customThreshold = 0;
+	meatState = 0;	//No meat selected yet
+	customThreshold = 0; //Clear custom threshold flag
 
 	// IO initial
 	P1OUT = 0x09;
@@ -615,8 +576,8 @@ void System_Initial()
 	LCD_init();						// LCD initial
 	LCD_clear();					// LCD clear
 
+	//Display startup message for 2 seconds
 	LCD_display_string(0,"  THERMOMEATER  ");
-
 	int i;
 	for (i = 0; i < 2; i++) {
 		_delay_cycles(1000000);
@@ -624,12 +585,14 @@ void System_Initial()
 
 	LCD_clear();
 
+	//Output Temperature read screen labels
 	LCD_display_string(0,"Des:");
-	LCD_display_time(0,8,time);		// display current time
-	LCD_display_string(1," Probe :");
-	LCD_display_char(1,13,0xDF);
-	LCD_display_char(1,14,'F');
-	LCD_display_number(0,4,Thr_temp);// display threshold temp number
+	LCD_display_time(0,8,time);			// display current time
+	LCD_display_string(1," Probe :");   //Initially reading probe
+	LCD_display_char(1,13,0xDF);		//Degrees symbol
+	LCD_display_char(1,14,'F');			//Initially farenheit
+	LCD_display_number(0,4,Thr_temp);	// display threshold temp number
 
-	ADS_Config(0); 					// set ADS1118 to convert local temperature, and start convertion.
+	ADS_Config(0); 						// set ADS1118 to convert local temperature,
+										//and start convertion.
 }
